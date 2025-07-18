@@ -269,7 +269,7 @@ export default function ProductsPage() {
                 alignItems: 'center'
               }}
             >
-              <Image
+              <ImageLoader
                 src={
                   product.imageKey ? img_url + product.imageKey : '/next.svg'
                 }
@@ -282,6 +282,19 @@ export default function ProductsPage() {
                   marginBottom: 12
                 }}
               />
+              {/* <Image
+                src={
+                  product.imageKey ? img_url + product.imageKey : '/next.svg'
+                }
+                alt={product.name}
+                width={200}
+                height={200}
+                style={{
+                  objectFit: 'cover',
+                  borderRadius: 4,
+                  marginBottom: 12
+                }}
+              /> */}
               <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 4 }}>
                 {product.name}
               </div>
@@ -355,6 +368,25 @@ export default function ProductsPage() {
           ))}
         </div>
       </main>
+    </div>
+  )
+}
+function ImageLoader({
+  src,
+  alt,
+  width,
+  height,
+  style
+}: {
+  src: string
+  alt: string
+  width: number
+  height: number
+  style?: React.CSSProperties
+}) {
+  return (
+    <div style={{ position: 'relative', width, height }}>
+      <img src={src} alt={alt} width={width} height={height} style={style} />
     </div>
   )
 }

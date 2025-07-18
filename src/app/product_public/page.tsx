@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import React, { useState, useEffect } from 'react'
 import Product_menu from '@/components/Product_menu'
 import ProductFilter from '@/components/ProductFilter'
@@ -269,10 +268,8 @@ export default function ProductsPage() {
                 alignItems: 'center'
               }}
             >
-              <Image
-                src={
-                  product.imageKey ? img_url + product.imageKey : '/next.svg'
-                }
+              <ImageLoader
+                src={img_url + product.imageKey}
                 alt={product.name}
                 width={200}
                 height={200}
@@ -354,6 +351,26 @@ export default function ProductsPage() {
           ))}
         </div>
       </main>
+    </div>
+  )
+}
+
+function ImageLoader({
+  src,
+  alt,
+  width,
+  height,
+  style
+}: {
+  src: string
+  alt: string
+  width: number
+  height: number
+  style?: React.CSSProperties
+}) {
+  return (
+    <div style={{ position: 'relative', width, height }}>
+      <img src={src} alt={alt} width={width} height={height} style={style} />
     </div>
   )
 }
