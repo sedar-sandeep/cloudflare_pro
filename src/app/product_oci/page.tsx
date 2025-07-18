@@ -1,9 +1,10 @@
 'use client'
 
-import Image from 'next/image'
+//import Image from 'next/image'
 import React, { useState, useEffect } from 'react'
 import Product_menu from '@/components/Product_menu'
 import ProductFilter from '@/components/ProductFilter'
+import Image from 'next/legacy/image'
 const img_url = 'https://oci.sedarshop.com/uploads/100001/lifestyle/'
 
 // Mock data for demonstration
@@ -386,7 +387,20 @@ function ImageLoader({
 }) {
   return (
     <div style={{ position: 'relative', width, height }}>
-      <img src={src} alt={alt} width={width} height={height} style={style} />
+      <Image
+        loader={cloudflareLoader}
+        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADA..."
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        style={style}
+      />
     </div>
   )
+}
+
+function cloudflareLoader({ src, width }) {
+  console.log(src, width, 'cloudflareLoader')
+  return `${src}?imwidth=${width}`
 }
