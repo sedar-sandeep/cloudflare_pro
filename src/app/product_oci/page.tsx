@@ -397,7 +397,7 @@ function ImageLoader({
     <div style={{ position: 'relative', width, height }}>
       <img
         key={src}
-        loader={error ? '/next.svg' : `${src}?imwidth=${width}`}
+        //  loader={error ? '/next.svg' : `${src}?imwidth=${width}`}
         src={error ? '/next.svg' : src}
         alt={alt}
         width={width}
