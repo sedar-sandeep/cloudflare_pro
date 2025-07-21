@@ -385,16 +385,39 @@ function ImageLoader({
   height: number
   style?: React.CSSProperties
 }) {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   return (
     <div style={{ position: 'relative', width, height }}>
-      <Image
-        loader={cloudflareLoader}
-        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADA..."
-        src={src}
+      {loading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#f6f6f6',
+            zIndex: 1
+          }}
+        >
+          <span style={{ color: '#aaa', fontSize: 18 }}>Loading...</span>
+        </div>
+      )}
+      <img
+        src={error ? '/next.svg' : src}
         alt={alt}
         width={width}
         height={height}
         style={style}
+        onLoad={() => setLoading(false)}
+        onError={() => {
+          setLoading(false)
+          setError(true)
+        }}
       />
     </div>
   )
