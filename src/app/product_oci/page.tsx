@@ -387,33 +387,22 @@ function ImageLoader({
 }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+
+  useEffect(() => {
+    setLoading(true)
+    setError(false)
+  }, [src])
+
   return (
     <div style={{ position: 'relative', width, height }}>
-      {loading && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#f6f6f6',
-            zIndex: 1
-          }}
-        >
-          <span style={{ color: '#aaa', fontSize: 18 }}>Loading...</span>
-        </div>
-      )}
       <img
+        key={src}
+        loader={error ? '/next.svg' : `${src}?imwidth=${width}`}
         src={error ? '/next.svg' : src}
         alt={alt}
         width={width}
         height={height}
         style={style}
-        onLoad={() => setLoading(false)}
         onError={() => {
           setLoading(false)
           setError(true)
@@ -423,7 +412,7 @@ function ImageLoader({
   )
 }
 
-function cloudflareLoader({ src, width }) {
-  console.log(src, width, 'cloudflareLoader')
-  return `${src}?imwidth=${width}`
-}
+// function cloudflareLoader({ src, width }: { src: string; width: number }) {
+//   console.log(src, width, 'cloudflareLoader')
+//   return `${src}?imwidth=${width}`
+// }
