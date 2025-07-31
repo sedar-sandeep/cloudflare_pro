@@ -372,6 +372,16 @@ export default function ProductsPage() {
     </div>
   )
 }
+
+function supportsWebP(): boolean {
+  if (typeof window === 'undefined') return false
+
+  const canvas = document.createElement('canvas')
+  canvas.width = 1
+  canvas.height = 1
+  return canvas.toDataURL('image/webp').indexOf('image/webp') === 5
+}
+
 function ImageLoader({
   src,
   alt,
@@ -387,18 +397,34 @@ function ImageLoader({
 }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [webpSupported, setWebpSupported] = useState(false)
 
   useEffect(() => {
     setLoading(true)
     setError(false)
+    setWebpSupported(supportsWebP())
   }, [src])
+
+  // Convert WebP URL to fallback format (jpg/png)
+  const getFallbackUrl = (webpUrl: string) => {
+    if (webpUrl.includes('.webp')) {
+      return webpUrl.replace('.webp', '.jpg')
+    }
+    return webpUrl
+  }
+
+  // Choose the appropriate image source
+  const imageSrc = error
+    ? '/next.svg'
+    : webpSupported
+    ? src
+    : getFallbackUrl(src)
 
   return (
     <div style={{ position: 'relative', width, height }}>
       <img
         key={src}
-        //  loader={error ? '/next.svg' : `${src}?imwidth=${width}`}
-        src={error ? '/next.svg' : src}
+        src={imageSrc}
         alt={alt}
         width={width}
         height={height}
