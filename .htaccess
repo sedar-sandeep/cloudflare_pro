@@ -1,26 +1,29 @@
-<IfModule mod_rewrite.c>
-RewriteEngine On
+# Force proper MIME types for images
+<FilesMatch "\.webp$">
+    ForceType image/webp
+    Header set Content-Disposition "inline"
+</FilesMatch>
 
-# Serve WebP if browser supports it and file exists
-RewriteCond %{HTTP_ACCEPT} image/webp
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteCond %{REQUEST_FILENAME} \.webp$
-RewriteRule ^(.+)\.webp$ $1.webp [T=image/webp,L]
+<FilesMatch "\.(jpg|jpeg)$">
+    ForceType image/jpeg
+    Header set Content-Disposition "inline"
+</FilesMatch>
 
-# Fallback: If WebP file doesn't exist, try JPG
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} \.webp$
-RewriteRule ^(.+)\.webp$ $1.jpg [L]
+<FilesMatch "\.png$">
+    ForceType image/png
+    Header set Content-Disposition "inline"
+</FilesMatch>
 
-# Fallback: If JPG doesn't exist, try PNG
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} \.webp$
-RewriteRule ^(.+)\.webp$ $1.png [L]
+# Alternative approach using mod_mime
+<IfModule mod_mime.c>
+    AddType image/webp .webp
+    AddType image/jpeg .jpg .jpeg
+    AddType image/png .png
 </IfModule>
 
-# Serve correct MIME types
-<IfModule mod_mime.c>
-AddType image/webp .webp
-AddType image/jpeg .jpg .jpeg
-AddType image/png .png
+# Ensure images are served inline
+<IfModule mod_headers.c>
+    <FilesMatch "\.(webp|jpg|jpeg|png)$">
+        Header set Content-Disposition "inline"
+    </FilesMatch>
 </IfModule>

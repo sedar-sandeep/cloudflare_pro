@@ -388,28 +388,48 @@ function ImageLoader({
 }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [imageUrl, setImageUrl] = useState(src)
 
   useEffect(() => {
     setLoading(true)
     setError(false)
     console.log('Loading image:', src)
+
+    // If the image is from R2 and might download instead of display, fetch it as blob
+    if (src.includes('r2.dev') || src.includes('sedarshop.com')) {
+      fetch(src)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const url = URL.createObjectURL(blob)
+          setImageUrl(url)
+          setLoading(false)
+        })
+        .catch((err) => {
+          console.log('Failed to load image as blob:', err)
+          setImageUrl(src) // Fallback to original URL
+          setLoading(false)
+        })
+    } else {
+      setImageUrl(src)
+      setLoading(false)
+    }
   }, [src])
 
   return (
     <div style={{ position: 'relative', width, height }}>
       <img
         key={src}
-        src={error ? '/next.svg' : src}
+        src={error ? '/next.svg' : imageUrl}
         alt={alt}
         width={width}
         height={height}
         style={style}
         onLoad={() => {
-          console.log('Image loaded successfully:', src)
+          console.log('Image loaded successfully:', imageUrl)
           setLoading(false)
         }}
         onError={(e) => {
-          console.log('Image failed to load:', src)
+          console.log('Image failed to load:', imageUrl)
           console.log('Error event:', e)
           setLoading(false)
           setError(true)
