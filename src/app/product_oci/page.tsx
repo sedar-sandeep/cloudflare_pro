@@ -388,52 +388,57 @@ function ImageLoader({
 }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [imageUrl, setImageUrl] = useState(src)
 
   useEffect(() => {
     setLoading(true)
     setError(false)
-    console.log('Loading image:', src)
-
-    // If the image is from R2 and might download instead of display, fetch it as blob
-    if (src.includes('r2.dev') || src.includes('sedarshop.com')) {
-      fetch(src)
-        .then((response) => response.blob())
-        .then((blob) => {
-          const url = URL.createObjectURL(blob)
-          setImageUrl(url)
-          setLoading(false)
-        })
-        .catch((err) => {
-          console.log('Failed to load image as blob:', err)
-          setImageUrl(src) // Fallback to original URL
-          setLoading(false)
-        })
-    } else {
-      setImageUrl(src)
-      setLoading(false)
-    }
+    console.log('=== ImageLoader Debug ===')
+    console.log('Original src:', src)
+    console.log('Image URL being used:', src)
   }, [src])
+
+  const handleLoad = () => {
+    console.log('✅ Image loaded successfully:', src)
+    setLoading(false)
+  }
+
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.log('❌ Image failed to load:', src)
+    console.log('Error details:', e)
+    setLoading(false)
+    setError(true)
+  }
 
   return (
     <div style={{ position: 'relative', width, height }}>
+      {loading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#f6f6f6',
+            zIndex: 1
+          }}
+        >
+          <span style={{ color: '#aaa', fontSize: 18 }}>Loading...</span>
+        </div>
+      )}
       <img
         key={src}
-        src={error ? '/next.svg' : imageUrl}
+        src={error ? '/next.svg' : src}
         alt={alt}
         width={width}
         height={height}
         style={style}
-        onLoad={() => {
-          console.log('Image loaded successfully:', imageUrl)
-          setLoading(false)
-        }}
-        onError={(e) => {
-          console.log('Image failed to load:', imageUrl)
-          console.log('Error event:', e)
-          setLoading(false)
-          setError(true)
-        }}
+        onLoad={handleLoad}
+        onError={handleError}
+        crossOrigin="anonymous"
       />
     </div>
   )
