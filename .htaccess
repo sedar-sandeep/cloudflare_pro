@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Check if browser supports WebP
+RewriteCond %{HTTP_ACCEPT} image/webp
+
+# Check if .webp version exists
+RewriteCond %{REQUEST_FILENAME}\.webp -f
+
+# Rewrite the jpg/png to webp
+RewriteRule (.+)\.(jpe?g|png)$ $1.$2.webp [T=image/webp,E=accept:1]
+</IfModule>
+
+# Serve correct MIME type for .webp files
+<IfModule mod_mime.c>
+AddType image/webp .webp
+</IfModule>
