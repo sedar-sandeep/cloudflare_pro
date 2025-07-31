@@ -1,29 +1,58 @@
-# Force proper MIME types for images
+# Enable rewrite engine
+RewriteEngine On
+
+# Force proper MIME types for all image formats
 <FilesMatch "\.webp$">
     ForceType image/webp
     Header set Content-Disposition "inline"
+    Header set Cache-Control "public, max-age=31536000"
 </FilesMatch>
 
 <FilesMatch "\.(jpg|jpeg)$">
     ForceType image/jpeg
     Header set Content-Disposition "inline"
+    Header set Cache-Control "public, max-age=31536000"
 </FilesMatch>
 
 <FilesMatch "\.png$">
     ForceType image/png
     Header set Content-Disposition "inline"
+    Header set Cache-Control "public, max-age=31536000"
 </FilesMatch>
 
-# Alternative approach using mod_mime
+# WebP fallback for older browsers
+RewriteCond %{HTTP_ACCEPT} !image/webp
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteCond %{REQUEST_FILENAME} \.webp$
+RewriteRule ^(.+)\.webp$ $1.jpg [L]
+
+# Alternative PNG fallback if JPG doesn't exist
+RewriteCond %{HTTP_ACCEPT} !image/webp
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteCond %{REQUEST_FILENAME} \.webp$
+RewriteCond %{REQUEST_FILENAME}\.jpg !-f
+RewriteRule ^(.+)\.webp$ $1.png [L]
+
+# Ensure proper MIME types are registered
 <IfModule mod_mime.c>
     AddType image/webp .webp
     AddType image/jpeg .jpg .jpeg
     AddType image/png .png
 </IfModule>
 
-# Ensure images are served inline
+# Set default character set
+AddDefaultCharset UTF-8
+
+# Enable compression for images
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE image/webp
+    AddOutputFilterByType DEFLATE image/jpeg
+    AddOutputFilterByType DEFLATE image/png
+</IfModule>
+
+# Security headers
 <IfModule mod_headers.c>
-    <FilesMatch "\.(webp|jpg|jpeg|png)$">
-        Header set Content-Disposition "inline"
-    </FilesMatch>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
 </IfModule>

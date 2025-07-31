@@ -386,63 +386,49 @@ function ImageLoader({
   height: number
   style?: React.CSSProperties
 }) {
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [imageDataUrl, setImageDataUrl] = useState<string>('')
 
   useEffect(() => {
+    setLoading(true)
     setError(false)
-    console.log('=== ImageLoader Debug ===')
-    console.log('Original src:', src)
-
-    // Convert image to base64 data URL
-    const convertToDataUrl = async () => {
-      try {
-        const response = await fetch(src)
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const blob = await response.blob()
-        const reader = new FileReader()
-
-        reader.onload = () => {
-          const dataUrl = reader.result as string
-          console.log('✅ Image converted to data URL')
-          setImageDataUrl(dataUrl)
-        }
-
-        reader.onerror = () => {
-          console.log('❌ Failed to convert image to data URL')
-          setError(true)
-        }
-
-        reader.readAsDataURL(blob)
-      } catch (err) {
-        console.log('❌ Failed to fetch image:', err)
-        setError(true)
-      }
-    }
-
-    convertToDataUrl()
+    console.log('Loading image:', src)
   }, [src])
 
   const handleLoad = () => {
-    console.log('✅ Image loaded successfully')
+    console.log('✅ Image loaded successfully:', src)
+    setLoading(false)
   }
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.log('❌ Image failed to load')
-    console.log('Error details:', e)
+    console.log('❌ Image failed to load:', src)
+    setLoading(false)
     setError(true)
   }
 
-  const displayUrl = error ? '/next.svg' : imageDataUrl || src
-
   return (
     <div style={{ position: 'relative', width, height }}>
+      {loading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#f6f6f6',
+            zIndex: 1
+          }}
+        >
+          <span style={{ color: '#aaa', fontSize: 18 }}>Loading...</span>
+        </div>
+      )}
       <img
         key={src}
-        src={displayUrl}
+        src={error ? '/next.svg' : src}
         alt={alt}
         width={width}
         height={height}
@@ -450,17 +436,6 @@ function ImageLoader({
         onLoad={handleLoad}
         onError={handleError}
       />
-      {/* Show the URL for debugging */}
-      <div
-        style={{
-          fontSize: '10px',
-          color: '#999',
-          marginTop: '5px',
-          wordBreak: 'break-all'
-        }}
-      >
-        {imageDataUrl ? 'Data URL loaded' : src}
-      </div>
     </div>
   )
 }
