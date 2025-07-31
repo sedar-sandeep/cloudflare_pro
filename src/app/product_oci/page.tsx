@@ -373,17 +373,6 @@ export default function ProductsPage() {
   )
 }
 
-function supportsWebP(): boolean {
-  if (typeof window === 'undefined') return false
-
-  const canvas = document.createElement('canvas')
-  canvas.width = 1
-  canvas.height = 1
-  const result = canvas.toDataURL('image/webp').indexOf('image/webp') === 5
-  console.log('WebP supported:', result)
-  return result
-}
-
 function ImageLoader({
   src,
   alt,
@@ -399,50 +388,25 @@ function ImageLoader({
 }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [webpSupported, setWebpSupported] = useState(false)
 
   useEffect(() => {
     setLoading(true)
     setError(false)
-    const supported = supportsWebP()
-    setWebpSupported(supported)
-    console.log('Original src:', src)
-    console.log('WebP supported:', supported)
   }, [src])
-
-  // Convert WebP URL to fallback format (jpg/png)
-  const getFallbackUrl = (webpUrl: string) => {
-    if (webpUrl.includes('.webp')) {
-      const fallbackUrl = webpUrl.replace('.webp', '.jpg')
-      console.log('Fallback URL:', fallbackUrl)
-      return fallbackUrl
-    }
-    return webpUrl
-  }
-
-  // Choose the appropriate image source
-  const imageSrc = error
-    ? '/next.svg'
-    : webpSupported
-    ? src
-    : getFallbackUrl(src)
-  console.log('Final imageSrc:', imageSrc)
 
   return (
     <div style={{ position: 'relative', width, height }}>
       <img
         key={src}
-        src={imageSrc}
+        src={error ? '/next.svg' : src}
         alt={alt}
         width={width}
         height={height}
         style={style}
         onLoad={() => {
-          console.log('Image loaded successfully:', imageSrc)
           setLoading(false)
         }}
         onError={() => {
-          console.log('Image failed to load:', imageSrc)
           setLoading(false)
           setError(true)
         }}
