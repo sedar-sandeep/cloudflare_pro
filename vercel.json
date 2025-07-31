@@ -1,0 +1,61 @@
+{
+    "headers": [
+        {
+            "source": "/(.*)\\.webp",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "image/webp"
+                },
+                {
+                    "key": "Content-Disposition",
+                    "value": "inline"
+                },
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000"
+                }
+            ]
+        },
+        {
+            "source": "/(.*)\\.(jpg|jpeg)",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "image/jpeg"
+                },
+                {
+                    "key": "Content-Disposition",
+                    "value": "inline"
+                },
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000"
+                }
+            ]
+        },
+        {
+            "source": "/(.*)\\.png",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "image/png"
+                },
+                {
+                    "key": "Content-Disposition",
+                    "value": "inline"
+                },
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000"
+                }
+            ]
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/(.*)\\.webp",
+            "destination": "/api/images?url=$1.webp"
+        }
+    ]
+}

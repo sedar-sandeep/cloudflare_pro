@@ -389,19 +389,33 @@ function ImageLoader({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
+  // Convert external image URLs to use our API route
+  const getImageUrl = (originalUrl: string) => {
+    if (
+      originalUrl.includes('r2.dev') ||
+      originalUrl.includes('sedarshop.com')
+    ) {
+      return `/api/images?url=${encodeURIComponent(originalUrl)}`
+    }
+    return originalUrl
+  }
+
+  const imageUrl = getImageUrl(src)
+
   useEffect(() => {
     setLoading(true)
     setError(false)
     console.log('Loading image:', src)
-  }, [src])
+    console.log('Proxied URL:', imageUrl)
+  }, [src, imageUrl])
 
   const handleLoad = () => {
-    console.log('✅ Image loaded successfully:', src)
+    console.log('✅ Image loaded successfully:', imageUrl)
     setLoading(false)
   }
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.log('❌ Image failed to load:', src)
+    console.log('❌ Image failed to load:', imageUrl)
     setLoading(false)
     setError(true)
   }
@@ -427,8 +441,8 @@ function ImageLoader({
         </div>
       )}
       <img
-        key={src}
-        src={error ? '/next.svg' : src}
+        key={imageUrl}
+        src={error ? '/next.svg' : imageUrl}
         alt={alt}
         width={width}
         height={height}
