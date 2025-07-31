@@ -388,31 +388,32 @@ function ImageLoader({
 }) {
   const [error, setError] = useState(false)
 
+  // Convert the original URL to use our API route
+  const getImageUrl = (originalUrl: string) => {
+    if (
+      originalUrl.includes('r2.dev') ||
+      originalUrl.includes('sedarshop.com')
+    ) {
+      return `/api/images?url=${encodeURIComponent(originalUrl)}`
+    }
+    return originalUrl
+  }
+
+  const imageUrl = getImageUrl(src)
+
   useEffect(() => {
     setError(false)
     console.log('=== ImageLoader Debug ===')
     console.log('Original src:', src)
-
-    // Test if the image URL is accessible
-    fetch(src, { method: 'HEAD' })
-      .then((response) => {
-        console.log(
-          '✅ Image URL is accessible:',
-          response.status,
-          response.headers.get('content-type')
-        )
-      })
-      .catch((err) => {
-        console.log('❌ Image URL is not accessible:', err)
-      })
-  }, [src])
+    console.log('Proxied URL:', imageUrl)
+  }, [src, imageUrl])
 
   const handleLoad = () => {
-    console.log('✅ Image loaded successfully:', src)
+    console.log('✅ Image loaded successfully:', imageUrl)
   }
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.log('❌ Image failed to load:', src)
+    console.log('❌ Image failed to load:', imageUrl)
     console.log('Error details:', e)
     setError(true)
   }
@@ -420,8 +421,8 @@ function ImageLoader({
   return (
     <div style={{ position: 'relative', width, height }}>
       <img
-        key={src}
-        src={error ? '/next.svg' : src}
+        key={imageUrl}
+        src={error ? '/next.svg' : imageUrl}
         alt={alt}
         width={width}
         height={height}
@@ -438,7 +439,7 @@ function ImageLoader({
           wordBreak: 'break-all'
         }}
       >
-        {src}
+        {imageUrl}
       </div>
     </div>
   )
