@@ -387,42 +387,62 @@ function ImageLoader({
   style?: React.CSSProperties
 }) {
   const [error, setError] = useState(false)
-
-  // Convert the original URL to use our API route
-  const getImageUrl = (originalUrl: string) => {
-    if (
-      originalUrl.includes('r2.dev') ||
-      originalUrl.includes('sedarshop.com')
-    ) {
-      return `/api/images?url=${encodeURIComponent(originalUrl)}`
-    }
-    return originalUrl
-  }
-
-  const imageUrl = getImageUrl(src)
+  const [imageDataUrl, setImageDataUrl] = useState<string>('')
 
   useEffect(() => {
     setError(false)
     console.log('=== ImageLoader Debug ===')
     console.log('Original src:', src)
-    console.log('Proxied URL:', imageUrl)
-  }, [src, imageUrl])
+
+    // Convert image to base64 data URL
+    const convertToDataUrl = async () => {
+      try {
+        const response = await fetch(src)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const blob = await response.blob()
+        const reader = new FileReader()
+
+        reader.onload = () => {
+          const dataUrl = reader.result as string
+          console.log('✅ Image converted to data URL')
+          setImageDataUrl(dataUrl)
+        }
+
+        reader.onerror = () => {
+          console.log('❌ Failed to convert image to data URL')
+          setError(true)
+        }
+
+        reader.readAsDataURL(blob)
+      } catch (err) {
+        console.log('❌ Failed to fetch image:', err)
+        setError(true)
+      }
+    }
+
+    convertToDataUrl()
+  }, [src])
 
   const handleLoad = () => {
-    console.log('✅ Image loaded successfully:', imageUrl)
+    console.log('✅ Image loaded successfully')
   }
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.log('❌ Image failed to load:', imageUrl)
+    console.log('❌ Image failed to load')
     console.log('Error details:', e)
     setError(true)
   }
 
+  const displayUrl = error ? '/next.svg' : imageDataUrl || src
+
   return (
     <div style={{ position: 'relative', width, height }}>
       <img
-        key={imageUrl}
-        src={error ? '/next.svg' : imageUrl}
+        key={src}
+        src={displayUrl}
         alt={alt}
         width={width}
         height={height}
@@ -439,7 +459,7 @@ function ImageLoader({
           wordBreak: 'break-all'
         }}
       >
-        {imageUrl}
+        {imageDataUrl ? 'Data URL loaded' : src}
       </div>
     </div>
   )
