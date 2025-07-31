@@ -379,7 +379,9 @@ function supportsWebP(): boolean {
   const canvas = document.createElement('canvas')
   canvas.width = 1
   canvas.height = 1
-  return canvas.toDataURL('image/webp').indexOf('image/webp') === 5
+  const result = canvas.toDataURL('image/webp').indexOf('image/webp') === 5
+  console.log('WebP supported:', result)
+  return result
 }
 
 function ImageLoader({
@@ -402,13 +404,18 @@ function ImageLoader({
   useEffect(() => {
     setLoading(true)
     setError(false)
-    setWebpSupported(supportsWebP())
+    const supported = supportsWebP()
+    setWebpSupported(supported)
+    console.log('Original src:', src)
+    console.log('WebP supported:', supported)
   }, [src])
 
   // Convert WebP URL to fallback format (jpg/png)
   const getFallbackUrl = (webpUrl: string) => {
     if (webpUrl.includes('.webp')) {
-      return webpUrl.replace('.webp', '.jpg')
+      const fallbackUrl = webpUrl.replace('.webp', '.jpg')
+      console.log('Fallback URL:', fallbackUrl)
+      return fallbackUrl
     }
     return webpUrl
   }
@@ -419,6 +426,7 @@ function ImageLoader({
     : webpSupported
     ? src
     : getFallbackUrl(src)
+  console.log('Final imageSrc:', imageSrc)
 
   return (
     <div style={{ position: 'relative', width, height }}>
@@ -429,7 +437,12 @@ function ImageLoader({
         width={width}
         height={height}
         style={style}
+        onLoad={() => {
+          console.log('Image loaded successfully:', imageSrc)
+          setLoading(false)
+        }}
         onError={() => {
+          console.log('Image failed to load:', imageSrc)
           setLoading(false)
           setError(true)
         }}
