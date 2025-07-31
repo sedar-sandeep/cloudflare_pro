@@ -386,49 +386,39 @@ function ImageLoader({
   height: number
   style?: React.CSSProperties
 }) {
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    setLoading(true)
     setError(false)
     console.log('=== ImageLoader Debug ===')
     console.log('Original src:', src)
-    console.log('Image URL being used:', src)
+
+    // Test if the image URL is accessible
+    fetch(src, { method: 'HEAD' })
+      .then((response) => {
+        console.log(
+          '✅ Image URL is accessible:',
+          response.status,
+          response.headers.get('content-type')
+        )
+      })
+      .catch((err) => {
+        console.log('❌ Image URL is not accessible:', err)
+      })
   }, [src])
 
   const handleLoad = () => {
     console.log('✅ Image loaded successfully:', src)
-    setLoading(false)
   }
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.log('❌ Image failed to load:', src)
     console.log('Error details:', e)
-    setLoading(false)
     setError(true)
   }
 
   return (
     <div style={{ position: 'relative', width, height }}>
-      {loading && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#f6f6f6',
-            zIndex: 1
-          }}
-        >
-          <span style={{ color: '#aaa', fontSize: 18 }}>Loading...</span>
-        </div>
-      )}
       <img
         key={src}
         src={error ? '/next.svg' : src}
@@ -438,8 +428,18 @@ function ImageLoader({
         style={style}
         onLoad={handleLoad}
         onError={handleError}
-        crossOrigin="anonymous"
       />
+      {/* Show the URL for debugging */}
+      <div
+        style={{
+          fontSize: '10px',
+          color: '#999',
+          marginTop: '5px',
+          wordBreak: 'break-all'
+        }}
+      >
+        {src}
+      </div>
     </div>
   )
 }
