@@ -392,6 +392,7 @@ function ImageLoader({
   useEffect(() => {
     setLoading(true)
     setError(false)
+    console.log('Loading image:', src)
   }, [src])
 
   return (
@@ -404,9 +405,12 @@ function ImageLoader({
         height={height}
         style={style}
         onLoad={() => {
+          console.log('Image loaded successfully:', src)
           setLoading(false)
         }}
-        onError={() => {
+        onError={(e) => {
+          console.log('Image failed to load:', src)
+          console.log('Error event:', e)
           setLoading(false)
           setError(true)
         }}

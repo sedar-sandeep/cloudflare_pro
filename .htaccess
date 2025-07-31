@@ -1,36 +1,26 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
-# Check if browser supports WebP
+# Serve WebP if browser supports it and file exists
 RewriteCond %{HTTP_ACCEPT} image/webp
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteCond %{REQUEST_FILENAME} \.webp$
+RewriteRule ^(.+)\.webp$ $1.webp [T=image/webp,L]
 
-# Check if .webp version exists
-RewriteCond %{REQUEST_FILENAME}\.webp -f
-
-# Rewrite the jpg/png to webp
-RewriteRule (.+)\.(jpe?g|png)$ $1.$2.webp [T=image/webp,E=accept:1]
-
-# Fallback: If WebP is not supported or doesn't exist, serve original format
+# Fallback: If WebP file doesn't exist, try JPG
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME}\.webp -f
-RewriteRule (.+)\.webp$ $1.jpg [L]
+RewriteCond %{REQUEST_FILENAME} \.webp$
+RewriteRule ^(.+)\.webp$ $1.jpg [L]
 
-# Alternative fallback for PNG if JPG doesn't exist
+# Fallback: If JPG doesn't exist, try PNG
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME}\.webp -f
-RewriteCond %{REQUEST_FILENAME}\.jpg !-f
-RewriteRule (.+)\.webp$ $1.png [L]
+RewriteCond %{REQUEST_FILENAME} \.webp$
+RewriteRule ^(.+)\.webp$ $1.png [L]
 </IfModule>
 
-# Serve correct MIME type for .webp files
+# Serve correct MIME types
 <IfModule mod_mime.c>
 AddType image/webp .webp
-</IfModule>
-
-# Set proper cache headers for images
-<IfModule mod_expires.c>
-ExpiresActive On
-ExpiresByType image/webp "access plus 1 year"
-ExpiresByType image/jpeg "access plus 1 year"
-ExpiresByType image/png "access plus 1 year"
+AddType image/jpeg .jpg .jpeg
+AddType image/png .png
 </IfModule>
